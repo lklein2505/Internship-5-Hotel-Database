@@ -1,4 +1,4 @@
-CREATE DATABASE Hotel
+﻿CREATE DATABASE Hotel
 
 --
 
@@ -73,11 +73,14 @@ INSERT INTO Hotels(HotelName, HotelLocation, HotelRating) VALUES
 
 
 INSERT INTO Employees(FirstName, LastName, Age, Salary, Job, HotelId) VALUES
-('Miroslav', 'Tonki?', 45, 8000, 'Receptionist', 2),
-('Jozo', 'Vranje�', 58, 7500, 'Receptionist', 1),
-('Katica', 'Miji?', 65, 6000, 'Cleaner', 2),
+('Miroslav', 'Tonkić', 45, 8000, 'Receptionist', 2),
+('Jozo', 'Vranješ', 58, 7500, 'Receptionist', 1),
+('Katica', 'Mijić', 65, 6000, 'Cleaner', 2),
 ('Lucija', 'Brekalo', 38, 5500, 'Cleaner', 3),
 ('Marija', 'Zadro', 30, 6500, 'Room service', 1);
+
+INSERT INTO Employees(FirstName, LastName, Age, Salary, Job, HotelId) VALUES
+('Slaven', 'Kurkut', 64, 6500, 'Room service', 4);
 
 
 INSERT INTO Rooms (RoomNumber, Capacity, Category, Price, HotelId) VALUES
@@ -88,20 +91,25 @@ INSERT INTO Rooms (RoomNumber, Capacity, Category, Price, HotelId) VALUES
 (108, 2, 'Romantic', 580, 5);
 
 
+INSERT INTO Rooms (RoomNumber, Capacity, Category, Price, HotelId) VALUES
+(102, 3, 'Standard', 450, 2),
+(302, 3, 'Standard', 380, 2);
+
+
 INSERT INTO Buyers (FirstName, LastName, Oib, PhoneNumber) VALUES
 ('Grigor', 'Dimitrov', '15487542357', '0915789464'),
-('Ante', 'Kivi?', '54876512987', '0984579412'),
-('Mirko', 'Barbari?', '64852242154', '0986795545'),
+('Ante', 'Kivić', '54876512987', '0984579412'),
+('Mirko', 'Barbarić', '64852242154', '0986795545'),
 ('Josip', 'Broz', '33554875124', '0955847787'),
 ('Nelson', 'Mandela', '99988844452', '0918545584');
 
 
 INSERT INTO Guests (RoomId, FirstName, LastName, Oib, PhoneNumber) VALUES
 (2, 'Klara', 'Dimitrov', '15488442357', '0916544464'),
-(3 ,'Ante', 'Bosan?i?', '48744512987', '0984584711'),
-(4, 'Katarina', 'Su?i?', '22544742154', '0915595548'),
+(3 ,'Ante', 'Bosančić', '48744512987', '0984584711'),
+(4, 'Katarina', 'Sučić', '22544742154', '0915595548'),
 (2, 'Grigor', 'Dimitrov', '15487542357', '0915789464'),
-(3, 'Martin', 'Bosan?i?', '91187844452', '0918889584');
+(3, 'Martin', 'Bosančić', '91187844452', '0918889584');
 
 
 INSERT INTO Purchases (BuyerId, RoomId, StayType, Price, TransactionDate, StartTime, EndTime) VALUES
@@ -111,6 +119,12 @@ INSERT INTO Purchases (BuyerId, RoomId, StayType, Price, TransactionDate, StartT
 (5, 1, 'Pansion', 5000, '2020-6-25', '2020-7-24', '2020-7-28'),
 (3, 1, 'Regular', 1800, '2020-11-11', '2020-11-24', '2020-11-27');
 
+INSERT INTO Purchases (BuyerId, RoomId, StayType, Price, TransactionDate, StartTime, EndTime) VALUES
+(2, 3, 'Pansion', 10000, '2020-11-18', '2020-12-19', '2020-12-28');
+
+INSERT INTO Purchases (BuyerId, RoomId, StayType, Price, TransactionDate, StartTime, EndTime) VALUES
+(1, 4, 'Half pansion', 800, '2019-11-18', '2019-12-19', '2019-12-20');
+
 
 INSERT INTO GuestStays (GuestId, PurchasesId) VALUES
 (1, 3),
@@ -118,3 +132,39 @@ INSERT INTO GuestStays (GuestId, PurchasesId) VALUES
 (3, 2),
 (4, 3),
 (5, 2);
+
+--
+
+SELECT * FROM Rooms 
+WHERE HotelId = (SELECT Id FROM Hotels WHERE HotelName = 'Hercegovka') 
+ORDER BY RoomNumber ASC;
+
+SELECT * FROM Rooms WHERE RoomNumber LIKE '1%';
+
+SELECT FirstName, LastName FROM Employees 
+WHERE HotelId = 3 AND JOB = 'Cleaner';
+
+SELECT * FROM Purchases 
+WHERE TransactionDate >= '2020-12-01' AND Price > 1000;
+
+SELECT * FROM Purchases
+WHERE (GETDATE() BETWEEN StartTime AND EndTime);
+
+DELETE FROM Purchases
+WHERE StartTime < '2020-1-1';
+
+UPDATE Rooms SET Capacity = 4
+WHERE HotelId = 2 AND Capacity = 3;
+
+SELECT * FROM Purchases 
+WHERE RoomId = 4
+ORDER BY StartTime ASC;
+
+SELECT * FROM Purchases
+WHERE (StayType = 'Pansion' OR StayType = 'Half pansion') AND RoomId IN 
+(SELECT Id FROM Rooms WHERE HotelId IN 
+(SELECT Id FROM Hotels WHERE HotelName = 'Hercegovka'));
+
+UPDATE TOP(2) Employees SET Job = 'Receptionist'
+WHERE Job = 'Room service';
+
